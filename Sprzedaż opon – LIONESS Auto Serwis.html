@@ -1,0 +1,243 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Sprzedaż opon – LIONESS Auto Serwis</title>
+<style>
+body {
+  margin: 0;
+  font-family: 'Segoe UI', sans-serif;
+  background-color: #0a1a33;
+  color: #fff;
+}
+h2 {
+  text-align: center;
+  color: #ffcc00;
+  margin-top: 20px;
+}
+.container {
+  display: flex;
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 20px;
+  gap: 20px;
+}
+.left-panel, .right-panel {
+  flex: 1;
+  background: #162d5c;
+  padding: 20px;
+  border-radius: 10px;
+  box-shadow: 0 4px 10px rgba(0,0,0,0.5);
+  display: flex;
+  flex-direction: column;
+}
+.label-row {
+  display: flex;
+  gap: 10px;
+  justify-content: space-between;
+}
+.label-row label {
+  flex: 1;
+  text-align: center;
+  font-weight: bold;
+  color: #ffcc00;
+}
+.input-row {
+  display: flex;
+  gap: 10px;
+  margin-bottom: 10px;
+}
+.input-row input {
+  padding: 8px;
+  border-radius: 6px;
+  border: none;
+  flex: 1;
+  text-align: center;
+}
+.input-row .btn {
+  flex: 0 0 80px;
+  padding: 6px;
+  font-size: 0.9em;
+}
+.record-list {
+  margin-top: 15px;
+  display: flex;
+  flex-direction: column; /* вертикальний список */
+  gap: 10px;
+}
+.record-item {
+  display: flex;
+  align-items: center;
+  background: #0f234d;
+  padding: 10px;
+  border-radius: 6px;
+  gap: 10px;
+  box-sizing: border-box;
+}
+.record-field {
+  background: #1b366d;
+  padding: 5px 8px;
+  border-radius: 4px;
+  flex: 1;
+  text-align: center;
+}
+.record-item button {
+  flex: 0 0 70px;
+  padding: 5px;
+}
+.right-panel input {
+  width: 100%;
+  margin-bottom: 10px;
+  padding: 8px;
+  border-radius: 6px;
+  border: none;
+}
+.tyre-list {
+  margin-top: 10px;
+  overflow-y: auto;
+}
+.tyre-item {
+  background: #0f234d;
+  padding: 10px;
+  margin-bottom: 8px;
+  border-radius: 6px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  transition: 0.3s;
+}
+.tyre-item:hover { background: #ffcc0040; color: #0a1a33; }
+.btn-right {
+  flex: 0 0 70px;
+  padding: 5px;
+  margin-left: 10px;
+}
+</style>
+</head>
+<body>
+
+<h2>Sprzedaż opon – LIONESS Auto Serwis</h2>
+
+<div class="container">
+
+<!-- Ліва панель -->
+<div class="left-panel">
+  <h3>Dodaj oponę</h3>
+  <div class="label-row">
+    <label>Rozmiar</label>
+    <label>Marka</label>
+    <label>Sztuki</label>
+    <label>Cena za 1 szt.</label>
+    <label></label>
+  </div>
+  <div class="input-row">
+    <input type="text" id="inputRozmiar" placeholder="np. 195/65R15">
+    <input type="text" id="inputMarka" placeholder="np. Point-S">
+    <input type="text" id="inputIlosc" placeholder="np. 4">
+    <input type="text" id="inputCena" placeholder="np. 300">
+    <button class="btn" id="saveTyre">Zapisz</button>
+  </div>
+  <div class="record-list" id="recordList"></div>
+</div>
+
+<!-- Права панель -->
+<div class="right-panel">
+  <h3>Szukaj po rozmiarze</h3>
+  <div style="display:flex; gap:10px;">
+    <input type="text" id="searchSize" placeholder="Np. 205/55/16">
+    <button class="btn" id="searchBtn">Szukaj</button>
+  </div>
+  <div class="tyre-list" id="tyreList"></div>
+</div>
+
+</div>
+
+<script>
+const inputRozmiar = document.getElementById('inputRozmiar');
+const inputMarka = document.getElementById('inputMarka');
+const inputIlosc = document.getElementById('inputIlosc');
+const inputCena = document.getElementById('inputCena');
+const recordList = document.getElementById('recordList');
+const saveTyre = document.getElementById('saveTyre');
+
+let zapisaneOpony = [];
+
+saveTyre.addEventListener('click', () => {
+  const r = inputRozmiar.value.trim();
+  const m = inputMarka.value.trim();
+  const i = inputIlosc.value.trim();
+  const c = inputCena.value.trim();
+  if (!r || !m || !i || !c) {
+    alert("Uzupełnij wszystkie pola!");
+    return;
+  }
+  const opona = { 
+    rozmiar: r, 
+    marka: m, 
+    ilosc: i + 'szt',  
+    cena: c + 'zł'     
+  };
+  zapisaneOpony.push(opona);
+  renderRecords();
+  inputRozmiar.value = '';
+  inputMarka.value = '';
+  inputIlosc.value = '';
+  inputCena.value = '';
+});
+
+function renderRecords() {
+  recordList.innerHTML = '';
+  zapisaneOpony.forEach((o, index) => {
+    const item = document.createElement('div');
+    item.classList.add('record-item');
+    item.innerHTML = `
+      <div class="record-field">${o.rozmiar}</div>
+      <div class="record-field">${o.marka}</div>
+      <div class="record-field">${o.ilosc}</div>
+      <div class="record-field">${o.cena}</div>
+      <button class="btn">Usuń</button>
+    `;
+    item.querySelector('button').addEventListener('click', () => {
+      zapisaneOpony.splice(index, 1);
+      renderRecords();
+    });
+    recordList.appendChild(item);
+  });
+}
+
+/* --- Права частина: пошук по лівих записах, видалення тільки справа --- */
+const searchSize = document.getElementById('searchSize');
+const searchBtn = document.getElementById('searchBtn');
+const tyreList = document.getElementById('tyreList');
+
+searchBtn.addEventListener('click', () => {
+  const val = searchSize.value.trim();
+  tyreList.innerHTML = '';
+  if (!val) {
+    alert("Wpisz rozmiar opony!");
+    return;
+  }
+  const results = zapisaneOpony.filter(o => o.rozmiar.includes(val));
+  if (results.length === 0) {
+    tyreList.innerHTML = `<p>Brak wyników dla rozmiaru: <strong>${val}</strong></p>`;
+  } else {
+    results.forEach((o, index) => {
+      const div = document.createElement('div');
+      div.classList.add('tyre-item');
+      div.innerHTML = `
+        <span>${o.rozmiar} | ${o.marka} | ${o.ilosc} | ${o.cena}</span>
+        <button class="btn-right">Usuń</button>
+      `;
+      // Видаляємо тільки з правого блоку
+      div.querySelector('button').addEventListener('click', () => {
+        div.remove();
+      });
+      tyreList.appendChild(div);
+    });
+  }
+});
+</script>
+
+</body>
+</html>
